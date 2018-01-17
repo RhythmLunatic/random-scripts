@@ -16,8 +16,8 @@ Local $iPID = Run("Touhou voice mod\th123vB13.exe")
 WinWait("[CLASS:hspwnd0]", "")
 ; Click wav button
 ControlClick("東方非想天則に魂を以下略","wav音声", 16384)
-; Wait
-Sleep(100)
+; Apparently the window won't launch unless I wait 1ms
+Sleep(1)
 ; Launch th123.exe
 Run("th123e.exe")
 ; Wait (Window has to appear)
