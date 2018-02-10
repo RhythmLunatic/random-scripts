@@ -15,6 +15,7 @@ if sys.argv[1] == "-text":
 	decode = True
 	imgName = sys.argv[2]
 else:
+	decode = False
 	imgName = sys.argv[1]
 
 im = Image.open(imgName, 'r')
