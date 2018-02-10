@@ -2,6 +2,7 @@
 
 #Trying to decode monika.chr from Doki Doki Literature Club? Use this!
 #...Unless you find something better, because this script runs like garbage.
+#This script will read in any image containing pure white and black pixels and output their binary representations.
 
 #Get width & height
 OUTPUT=$(convert $1 -print "%wx%h\n" /dev/null)
