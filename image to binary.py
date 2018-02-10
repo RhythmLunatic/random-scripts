@@ -1,6 +1,9 @@
 import sys
 from PIL import Image
 
+#This decodes an image of pure white and black squares into binary (or text if you use -text)
+#Trying to decode monika.chr from Doki Doki Literature Club? Use this!
+
 def decode_binary_string(s):
 	return ''.join(chr(int(s[i*8:i*8+8],2)) for i in range(len(s)//8))
 
