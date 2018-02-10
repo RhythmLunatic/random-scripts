@@ -1,6 +1,7 @@
 #!/bin/bash
 
 #Trying to decode monika.chr from Doki Doki Literature Club? Use this!
+#...Unless you find something better, because this script runs like garbage.
 
 #Get width & height
 OUTPUT=$(convert $1 -print "%wx%h\n" /dev/null)
