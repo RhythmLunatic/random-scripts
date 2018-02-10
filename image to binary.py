@@ -2,6 +2,7 @@ import sys
 from PIL import Image
 
 #This decodes an image of pure white and black squares into binary (or text if you use -text)
+#The image must be a 1bit palette, if it's not showing 1s and 0s open it in GIMP and do Image -> Mode -> Indexed -> use black and white palette and export it
 #Trying to decode monika.chr from Doki Doki Literature Club? Use this!
 
 def decode_binary_string(s):
