@@ -29,7 +29,7 @@ Local $hWnd2 = WinWait("[CLASS:th123_110a]", "")
 ; Set window as always on top
 WinSetOnTop($hWnd2, "", 1)
 ;DrawBorder can take some time to start up, wait so th123 can be the active application and DrawImage doesn't take it away
-WinWait("XNADrawImage")
+WinWaitActive("XNADrawImage")
 WinActivate("[CLASS:th123_110a]", "")
 ;Hide the taskbar
 Opt('WINTITLEMATCHMODE', 4)
