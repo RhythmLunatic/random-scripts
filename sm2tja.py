@@ -1,20 +1,23 @@
 """
-Convert a .sm file to .tja.
+Convert a .sm file to .tja, for those like me who refuse to use any editor other than ArrowVortex
 How to write your .sm:
-A note on any of the inner two lanes is a don (0010 or 0100)
-A note on any of the outer two lanes is a kat (1000 or 0001)
-One hold note on any lane is a roll note (2000, 0200, 0020, 0002)
-Two notes on the inner lanes is a big don (0110)
-Two notes on the outer lanes is a big kat (1001)
-Two holds on the inner lanes or outer lanes is a big roll (2002 or 0220)
+(Parenthesis means SM note ID -> TJA note ID)
+A note on any of the inner two lanes is a don (0010 or 0100 -> 1)
+A note on any of the outer two lanes is a kat (1000 or 0001 -> 2)
+Two notes on the inner lanes is a big don (0110 -> 3)
+Two notes on the outer lanes is a big kat (1001 -> 4)
+One hold note on any lane is a roll note (2000, 0200, 0020, 0002 -> 5)
+Two holds on the inner lanes or outer lanes is a big roll (2002 or 0220 -> 6)
 Anything else will be ignored and turned into an empty space.
 """
 
 import sys
 import random
 import os
-
-with open("255.sm") as file_read:
+if len(sys.argv) < 2:
+	print("usage:",sys.argv[0],"<any SM or SSC chart>")
+	sys.exit(0)
+with open(sys.argv[1]) as file_read:
 	content = file_read.readlines()					
 	insideNotesBlock = False
 	
@@ -22,9 +25,18 @@ with open("255.sm") as file_read:
 		if (line == "#NOTES:\n"): #Start of #NOTES block
 			insideNotesBlock = True
 			print("#START")
-		elif (line == ";\n"): #End of #NOTES block
-			insideNotesBlock = False
-			print("\n#END")
+		
+		if line[0] == "#":
+			tag, param = line.split(":")
+			param = param[:-2] #We're stripping the \n and the ;
+			if tag == "#TITLE":
+				print("TITLE:"+param)
+			elif tag == "#SUBTITLE":
+				print("SUBTITLE:"+param)
+			elif tag == "#OFFSET":
+				print("OFFSET:"+param)
+			elif tag == "#BPMS":
+				print("BPM:"+param.split("=")[1])
 			
 		if (insideNotesBlock):
 			#Found a beat line
@@ -55,9 +67,13 @@ with open("255.sm") as file_read:
 			elif line == ",\n":
 				#Finding a comma means end of current measure
 				print(",");
+			elif (line == ";\n"): #End of #NOTES block
+				insideNotesBlock = False
+				print("\n#END")
 			else:
 				print("Error: "+line.strip()+" is not a valid chart character")
 				
 		else:
 			#Line not within the #NOTES block, write the unmodified line to file
-			print(line)
+			#print(line)
+			pass
