@@ -1,0 +1,4 @@
+keyCheck function is in 0x1D820 / 41D820
+GetKeyboardState is called at 0x1D851 / 41D851
+Need to change what keys are checked (GetKeyboardState fills an array with the state of each and every key)
+lpKeyState is located at ???
