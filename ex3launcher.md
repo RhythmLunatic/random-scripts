@@ -1,8 +1,21 @@
-eXceed 3rd: Jade Penetrate -Black Package- has an unskippable launcher on start. This is a (bad) attempt to remove it.
+# eXceed 3rd: Jade Penetrate -Black Package- launcher skip
+
+**412A99: Replace 75 05 E8 B0 FC FF FF -> C6 46 08 0D 90 90 90 to make any key start the game.**
+- JNZ here is dead code and the function that this replaces is never called in the first place.
+- The new code in asm is `mov byte ptr [esi+8], 0D`. 0D = Enter key
+- MapVirtualKeyA checks esi+8 a few lines down and then some other functions check the same location.
+
+**412A93: Replace 75 35 -> 90 90 to make it ALWAYS check for a key press.**
+- Combining with the above patch, this means it checks for a key press even when there isn't one, and then the location that it checks for a key press has the enter key inserted into it. So it will start the game right away!
+
+## Other research
 
 412AD0 handles the popup
 
 412B2C Checks for GAME START using GetMessageA
+
+412A00 Don't remove this function, there is a call to 4047E0 which calls 404550 which seems to be a file handler. Maybe checks last used resolution.
+
 
 412C2B: This is triggered when you press start and is a HSPERROR... But it drops down to 412C42!
 - But setting eax to 6 manually just causes an access violation, crashing the game/debugger.
@@ -29,3 +42,5 @@ Random HSPERROR pitfalls (and the opcodes to patch them out):
 * 412a77: 75 -> eb
 * 4102aa: 0f 87 91 1c 00 00 -> 90 90 90 90 90 90
 * 412c01-412c41: Actually, don't patch these, if you do the game won't close :V
+
+Creditz: IDA Pro, Ollydbg, and online x86 disassembler and assemblers.
