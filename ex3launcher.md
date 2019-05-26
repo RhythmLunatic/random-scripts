@@ -5,7 +5,7 @@ eXceed 3rd: Jade Penetrate -Black Package- has an unskippable launcher on start.
 412B2C Checks for GAME START using GetMessageA
 
 412C2B: This is triggered when you press start and is a HSPERROR... But it drops down to 412C42!
-- But setting eax to 6 manually just causes an access violation
+- But setting eax to 6 manually just causes an access violation, crashing the game/debugger.
 
 Function 410290 sets up most of the game including loading assets, drawing the launcher window, resizing the window, etc.
 - 410693 sets window title
