@@ -1,5 +1,7 @@
 # eXceed 3rd: Jade Penetrate -Black Package- launcher skip
 
+Note: in a hex editor, do not type the 4 in front. That is for debuggers.
+
 **412A99: Replace 75 05 E8 B0 FC FF FF -> C6 46 08 0D 90 90 90 to make any key start the game.**
 - JNZ here is dead code and the function that this replaces is never called in the first place.
 - The new code in asm is `mov byte ptr [esi+8], 0D`. 0D = Enter key
