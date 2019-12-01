@@ -9,4 +9,4 @@ Same process as ex3. Open Exceed2.exe in a hex editor. Press Ctrl+G to jump to o
 
 ## Graphical fixes
 
-Text currently does not work. Download WineD3DForWindows_3.20-staging.zip, drop in ddraw.dll, libwine.dll, wined3d.dll.
+Download WineD3DForWindows_3.0.zip, drop in ddraw.dll, libwine.dll, wined3d.dll. Do not attempt a newer or older version, it will not work.
