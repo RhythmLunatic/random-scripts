@@ -6,9 +6,26 @@ Download WineD3DForWindows_3.0.zip, drop in ddraw.dll, libwine.dll, wined3d.dll.
 
 ## Disassembly for all games
 
-Download the decompiler: https://osdn.net/projects/hspdeco/
+### Disassembling the games
+Download the decompiler: https://github.com/YSRKEN/HSP-Decompiler/releases
 
-Run the decompiler. First select eXceed3rd-BR.exe. This will extract 3 files into a directory named eXceed3rd-BR in the directory that eXceed3rd-BR.exe was in. With the decompiler, browse to this folder and select start.ax. This should yield start.hsp once the process is finished.
+Run the decompiler. First select eXceed3rd-BR.exe. It will warn you that the BMP files are encrypted, press yes and decompile anyway.
+
+This will extract start.ax into a directory named eXceed3rd-BR in the directory that eXceed3rd-BR.exe was in. With the decompiler, browse to this folder and select start.ax. This should yield start.hsp once the process is finished.
+
+To extract the images, download this: https://github.com/gocha/spihsp/releases
+
+Extract hspdiv.exe and undpm32.dll, run it like `hspdiv.exe eXceed3rd-BR.exe`. Done. You have your BMP files.
+
+### Setting up a development environment
+
+Install the HSP compiler: http://hsp.tv/index2.html
+
+Move start.hsp to the same location as the exe file.
+
+Paste the BMP files you had before into the same location as the exe file.
+
+Open start.hsp in the HSP editor and press F5. You have a dev environment!
 
 ## eXceed 3rd: Jade Penetrate -Black Package- patches
 
