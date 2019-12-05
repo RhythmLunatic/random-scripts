@@ -27,6 +27,10 @@ Paste the BMP files you had before into the same location as the exe file.
 
 Open start.hsp in the HSP editor and press F5. You have a dev environment!
 
+## Fixing the music headers
+
+You can probably figure this out yourself, but change the first two bytes in the ogg files to 4F 67.
+
 ## eXceed 3rd: Jade Penetrate -Black Package- patches
 
 Note: in a hex editor, do not type the 4 in front. That is for debuggers.
