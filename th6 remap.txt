@@ -1,4 +1,16 @@
 keyCheck function is in 0x1D820 / 41D820
 GetKeyboardState is called at 0x1D851 / 41D851
-Need to change what keys are checked (GetKeyboardState fills an array with the state of each and every key)
-lpKeyState is located at ???
+lpKeyState is located at 0018FC66 but this gets overwritten later with some unrelated stuff
+To remap keys, change what address offset is used!
+
+https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+
+Ex. Z key func is checking AE. Z is 5A in the virtual key codes list. Let's say we want to check '1' at the top of the keyboard instead. 5A-31=29. Then ADD the result to where the key would be checking, so AE+29=D7. Now we have the function `mov eax,[ebp-000000D7]`. To get that in hex, do 100-D7 for 29, so the full function is 8B 85 29. Jump to the location of the asm func in a hex editor (tip: Ctrl+G jumps) and overwrite the existing value with the one you obtained in hex.
+
+
+1D885: CHECK DOWN KEY [epb-E0]
+CHECK UP KEY:
+LEFT KEY:
+RIGHT KEY:
+1DAAF: CHECK Z KEY [ebp-AE]
+1DADA: CHECK X KEY [ebp-B0]
