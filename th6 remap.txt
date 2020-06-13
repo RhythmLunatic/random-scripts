@@ -28,9 +28,9 @@ Secondary controls:
 1D9C4: Numpad 7 (upleft)    [epb-A1]
 1D9F1: Numpad 3 (downright) [epb-9F]
 1DA22: Numpad 1 (downleft)  [epb-A7]
+1DA4E: Numpad 9 (upright)   [epb-A6-1]
 
 Unused keys?
-1DA4E: No idea            [epb-A6-1]
 1DA7E: Home key???        [epb+E4] <--Yes, that's a plus. According to my disassembler.
 1DB97: Q key (Unused?)    [epb-B7]
 1DBC2: O key (Unused?)    [epb-B5]
