@@ -1,3 +1,5 @@
+Touhou 6: Emobdiment of Scarlet Devil key remapping (With a hex editor)
+
 keyCheck function is in 0x1D820 / 41D820
 GetKeyboardState is called at 0x1D851 / 41D851
 lpKeyState is located at 0018FC66 but this gets overwritten later with some unrelated stuff
