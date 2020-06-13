@@ -7,12 +7,31 @@ https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 
 Ex. Z key func is checking AE. Z is 5A in the virtual key codes list. Let's say we want to check '1' at the top of the keyboard instead. 5A-31=29. Then ADD the result to where the key would be checking, so AE+29=D7. Now we have the function `mov eax,[ebp-000000D7]`. To get that in hex, do 100-D7 for 29, so the full function is 8B 85 29. Jump to the location of the asm func in a hex editor (tip: Ctrl+G jumps) and overwrite the existing value with the one you obtained in hex.
 
+Simple way to find out what key it's checking:
+Subtract from E0 since we know E0 is down. For example, let's use [epb-AE]. E0 - AE is 32. Since down is key 0x28, add 32 to 0x28. This gets us key 0x5A, which is Z.
 
-1D857: CHECK UP KEY [epb-E2]
-1D885: CHECK DOWN KEY [epb-E0]
-1D8B1: CHECK LEFT KEY [epb-E3]
-1D8DE: CHECK RIGHT KEY: [epb-E1]
-1DAAF: CHECK Z KEY [ebp-AE]
-1DADA: CHECK X KEY [ebp-B0]
-CHECK SHIFT KEY:
-CHECK CTRL KEY:
+1D857: UP KEY     [epb-E2]
+1D885: DOWN KEY   [epb-E0]
+1D8B1: LEFT KEY   [epb-E3]
+1D8DE: RIGHT KEY  [epb-E1]
+1DAAF: Z KEY      [ebp-AE]
+1DADA: X KEY      [epb-B0]
+1DB07: SHIFT KEY  [epb-F8]
+1DB35: ESC KEY    [epb-ED]
+1DB61: CTRL KEY   [epb-F7]
+
+Secondary controls: 
+1D90F: Numpad 2 (down)      [epb-A0]
+1D93B: Numpad 8 (up)        [epb-A6]
+1D93B: Numpad 4 (left)      [epb-A4]
+1D996: Numpad 6 (right)     [epb-A2]
+1D9C4: Numpad 7 (upleft)    [epb-A1]
+1D9F1: Numpad 3 (downright) [epb-9F]
+1DA22: Numpad 1 (downleft)  [epb-A7]
+
+Unused keys?
+1DA4E: No idea            [epb-A6-1]
+1DA7E: Home key???        [epb+E4] <--Yes, that's a plus. According to my disassembler.
+1DB97: Q key (Unused?)    [epb-B7]
+1DBC2: O key (Unused?)    [epb-B5]
+1DBF0: IME Nonconvert key [epb-FB] <--Maybe secondary bomb key? I'm guessing this is something found on Japanese keyboards.
