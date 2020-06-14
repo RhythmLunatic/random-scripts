@@ -1,0 +1,120 @@
+//------------------------------------------------
+//--- 010 Editor v10.0.2 Binary Template
+//
+//      File: NX 010 Parser
+//   Authors: Rhythm Lunatic
+//   Version: 1.0
+//   Purpose: Highlight PIU NX20 files.
+//  Category: 
+// File Mask: *.NX
+//  ID Bytes: 4E 58 32 30
+//   History: 
+//------------------------------------------------
+
+struct HEADER {
+    char magic[4]<bgcolor=cGreen>; //NX20
+    uint startingColumn;
+    uint numColumns<fgcolor=cGreen>;
+    uint isLightMap<fgcolor=cGreen>;
+};
+
+struct ROW {
+    local int n;
+    for (n = 0; n < Header.numColumns; n++)
+    {
+        uint note;
+        if (note == 128)
+            break;
+    }
+};
+
+struct DIVISION {
+    uint id;
+    if (id < 9)
+    {
+        int16 minValue;
+        int16 maxValue;
+    }
+    else
+    {
+        int32 value;
+    }
+};
+
+struct BLOCK {
+    SetForeColor (cRed);
+    float startTime;
+    float BPM;
+    float scroll;
+    float offset;
+    float speed;
+    ubyte beatSplit;
+    ubyte beatMeasure;
+    ubyte isSmoothSpeed;
+    ubyte rawPadding;
+    SetForeColor(cNone);
+
+    uint numDivisions<bgcolor=cAqua>;
+    local int i;
+    for (i = 0; i < numDivisions; i++)
+    {
+        DIVISION Division;
+    }
+
+    uint numRows<bgcolor=cLtPurple>;
+    for (i = 0; i < numRows; i++)
+    {
+        ROW Row<optimize=false,fgcolor=cLtPurple>;
+    }
+};
+
+struct METADATA {
+
+    uint type<fgcolor=cYellow>;
+    uint value<fgcolor=cYellow>;
+};
+
+
+struct SPLITDATA {
+    SetForeColor( cLtBlue );
+     byte selectionBlock;
+     byte brainShower;
+     int16 padding;
+    SetForeColor( cNone );
+    
+    uint numMetadata<bgcolor=cYellow>;
+    local int i;
+    for (i = 0; i < numMetadata; i++)
+    {
+        METADATA section;
+    }
+
+    uint numBlocks<bgcolor=cRed>;
+    for (i = 0; i < numBlocks; i++)
+    {
+        BLOCK Block;
+    }
+};
+
+struct SPLIT {
+    //local uint nSplits = ReadUInt();
+    uint numSplits<bgcolor=cBlue>;
+    local int i;
+    for (i = 0; i < numSplits; i++)
+    {
+        SPLITDATA splitSection;
+    }
+};
+
+
+
+
+
+HEADER Header;
+uint numMetadata<bgcolor=cYellow>;
+local int j;
+for (j = 0; j < numMetadata; j++)
+{
+    METADATA section;
+}
+SPLIT Splits;
