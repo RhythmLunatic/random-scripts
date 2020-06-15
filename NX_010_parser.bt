@@ -18,15 +18,103 @@ struct HEADER {
     uint isLightMap<fgcolor=cGreen>;
 };
 
-struct ROW {
-    local int n;
-    for (n = 0; n < Header.numColumns; n++)
+/*enum <ubyte> noteFlag {
+    Empty_Row = 128
+};*/
+
+/*
+What??
+      var rawDisplayTop = (rawNote[1] & NOTE_FLAG_DISPLAY_TOP) !== 0;
+      var rawDisplayBottom = (rawNote[1] & NOTE_FLAG_DISPLAY_BOTTOM) !== 0;
+      var rawDisplayBottom25 = (rawNote[1] & NOTE_FLAG_DISPLAY_BOTTOM_25) !== 0;
+      if (rawDisplayBottom25) {
+        note.displayTop = rawDisplayTop;
+        note.displayMiddleTop = rawDisplayTop;
+        note.displayMiddleBottom = rawDisplayTop;
+        note.displayBottom = !rawDisplayTop;
+      } else {
+        note.displayTop = rawDisplayTop;
+        note.displayMiddleTop = rawDisplayTop;
+        note.displayMiddleBottom = rawDisplayBottom;
+        note.displayBottom = rawDisplayBottom;
+      }
+*/
+string displayConvert(ubyte n) {
+    //if (n & 
+};
+
+string displayPlayerNumber(ubyte n) {
+    local int t = (n & 192) >> 6; //I have no idea what this does
+    string s;
+    SPrintf(s,"%u",t);
+    return s;
+}
+
+string noteFlagConvert(ubyte n)
+{
+    if (n == 128)
+        return "Empty";
+    local int type = (n & 0x0F);
+    switch(type)
     {
-        uint note;
-        if (note == 128)
-            break;
+        case 1:
+            return "Item";
+        case 2:
+            return "Division";
+        case 3:
+            return "Tap";
+        case 7:
+            return "Hold Head";
+        case 11:
+            return "Hold Body";
+        case 15:
+            return "Hold Tail";
+        default:
+        {
+            string s;
+            SPrintf(s,"%u",type);
+            return s;
+        }
     }
 };
+
+struct NOTE {
+    ubyte type<read=noteFlagConvert>;
+    ubyte effect;
+    ubyte item_id;
+    ubyte player_number<read=displayPlayerNumber>;
+};
+
+string NoteDisplayEmpty(NOTE &n)
+{
+    if (n.type == 128 || n.type == 0)
+        return "Empty";
+    return "";
+}
+
+struct ROW {
+    local int n;
+    if (Header.isLightMap == 1)
+    {
+        NOTE note;
+    }
+    else
+    {
+        for (n = 0; n < Header.numColumns; n++)
+        {
+            NOTE note;
+            if (note.type == 128)
+                break;
+        }
+    }
+};
+
+string RowDisplayEmpty(ROW &r)
+{
+    if (r.note[0].type == 128)
+        return "Empty";
+    return "";
+}
 
 struct DIVISION {
     uint id;
@@ -64,14 +152,81 @@ struct BLOCK {
     uint numRows<bgcolor=cLtPurple>;
     for (i = 0; i < numRows; i++)
     {
-        ROW Row<optimize=false,fgcolor=cLtPurple>;
+        ROW Row<optimize=false,fgcolor=cLtPurple,read=RowDisplayEmpty>;
     }
+};
+
+enum <uint> mDataType { 
+    EARTHWORM = 1, 
+    FREEDOM = 17, 
+    FLASH = 18, 
+    Force_UR_DR = 32,
+    Force_SU_RI = 33,
+    SNAKE = 34,
+    ZIGZAG = 35,
+    TRILL_MACHINE = 49,
+    UNKNOWN_EFFECT = 64,
+    Noteskin_Override = 900,
+    P1_Noteskin_Override = 901,
+    P2_Noteskin_Override = 902,
+    P3_Noteskin_Override = 903,
+    P4_Noteskin_Override = 904,
+    P5_Noteskin_Override = 905,
+    Section = 1000,
+    Difficulty_Level = 1001,
+    Num_COOP_Players = 1002,
+    UNKNOWN_FLAG = 1004
+};
+
+enum <uint> NoteSkin {
+    Default,
+    Korean_Trump,
+    Old,
+    Easy,
+    Slime,
+    Music,
+    Canon_D,
+    Poker,
+    NX,
+    Lamb,
+    Horse,
+    Dog,
+    Girl,
+    Fire,
+    Ice,
+    Wind,
+    Left,
+    Right,
+    Left_And_Right,
+    NXA,
+    NX2,
+    Lightning,
+    Drum,
+    Missile,
+    Drum_Blue,
+    Drum_Red,
+    Drum_Yellow,
+    Football,
+    Rebirth,
+    Basic_Mode,
+    Fiesta,
+    Fiesta_2,
+    Prime,
+    Random = 254
 };
 
 struct METADATA {
 
-    uint type<fgcolor=cYellow>;
-    uint value<fgcolor=cYellow>;
+    mDataType type<fgcolor=cYellow>;
+    if (type >= 900 && type <= 905)
+    {
+    
+        NoteSkin value<fgcolor=cYellow>;
+    }
+    else
+    {
+        uint value<fgcolor=cYellow>;
+    }
 };
 
 
@@ -79,8 +234,8 @@ struct SPLITDATA {
     SetForeColor( cLtBlue );
      byte selectionBlock;
      byte brainShower;
-     int16 padding;
     SetForeColor( cNone );
+    int16 padding;
     
     uint numMetadata<bgcolor=cYellow>;
     local int i;
