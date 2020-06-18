@@ -4,24 +4,26 @@
  Author:         RhythmLunatic
 
  Script Function:
-	1. Launch th123 voice mod and auto select wav
+	1. Launch th123 voice mod
 	2. Launch game
-	3. close voice mod application when game is closed
+	3. close voice mod application & fake borders when game is closed
 
 #ce ----------------------------------------------------------------------------
 
 ; Launch voice mod
-Local $iPID = Run("Touhou voice mod\th123vB13.exe")
+; To have the voice mod automatically choose wav, decompile the exe using HSP decompiler, then change
+; it to skip the menu and goto wav, then install HSP runtime and recompile it.
+; Sorry I can't do any better right now...
+Local $iPID = Run("Voice\th123vB13_eng_autostart.exe","",@SW_HIDE)
 ; Wait for window to appear
-WinWait("[CLASS:hspwnd0]", "")
-; Click wav button
-ControlClick("東方非想天則に魂を以下略","wav音声", 16384)
-; Apparently the window won't launch unless I wait 1ms
-Sleep(1)
+Local $hWnd = WinWait("[CLASS:hspwnd0]", "")
+
 ; Launch th123.exe
 Run("th123e.exe")
-; Wait (Window has to appear)
-WinWait("[CLASS:th123_110a]", "")
+; Wait for window appear to get handle
+Local $hWnd2 = WinWait("[CLASS:th123_110a]", "")
+;set it active in case
+WinActivate($hWnd2)
 ; Wait for th123 to close
 WinWaitClose("[CLASS:th123_110a]")
 ; Kill voice mod
