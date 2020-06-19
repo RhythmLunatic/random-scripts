@@ -29,3 +29,61 @@ if less than 500 subtract from location of where the controller X Axis info is s
 add to it.
 Y Axis data is also stored but th123 doesn't use it.
 
+Current function:
+
+.text:0040A1CC                 cmp     ecx, 0FFFFFE0Ch ; -500
+.text:0040A1D2                 jge     short loc_40A1E1 ; jump if greater or equal to -500
+.text:0040A1D4                 cmp     [esi+38h], edi  ; =/= 0
+.text:0040A1D7                 jle     short SubControlXAxis
+.text:0040A1D9                 mov     [esi+38h], edi
+.text:0040A1DC
+.text:0040A1DC SubControlXAxis:                        ; CODE XREF: sub_40A1A0+37↑j
+.text:0040A1DC                 add     [esi+38h], edx
+.text:0040A1DF                 jmp     short loc_40A1FA
+.text:0040A1E1 ; ---------------------------------------------------------------------------
+.text:0040A1E1
+.text:0040A1E1 loc_40A1E1:                             ; CODE XREF: sub_40A1A0+32↑j
+.text:0040A1E1                 cmp     ecx, 500
+.text:0040A1E7                 jle     short ClrControlXAxis
+.text:0040A1E9                 cmp     [esi+38h], edi  ; =/= 0
+.text:0040A1EC                 jge     short AddControlXAxis
+.text:0040A1EE
+.text:0040A1EE ClrControlXAxis2:
+.text:0040A1EE                 mov     [esi+38h], edi
+.text:0040A1F1
+.text:0040A1F1 AddControlXAxis:                        ; CODE XREF: sub_40A1A0+4C↑j
+.text:0040A1F1                 add     dword ptr [esi+38h], 1
+.text:0040A1F5                 jmp     short loc_40A1FA
+.text:0040A1F7 ; ---------------------------------------------------------------------------
+.text:0040A1F7
+.text:0040A1F7 ClrControlXAxis:                        ; CODE XREF: sub_40A1A0+47↑j
+.text:0040A1F7                 mov     [esi+38h], edi
+.text:0040A1FA
+.text:0040A1FA loc_40A1FA:                             ; CODE XREF: sub_40A1A0+3F↑j
+.text:0040A1FA                                         ; sub_40A1A0+55↑j
+.text:0040A1FA                 mov     ecx, [eax+4]
+.text:0040A1FD                 cmp     ecx, 0FFFFFE0Ch
+.text:0040A203                 jge     short loc_40A212
+.text:0040A205                 cmp     [esi+3Ch], edi
+.text:0040A208                 jle     short SubControlYAxis
+.text:0040A20A                 mov     [esi+3Ch], edi
+.text:0040A20D
+.text:0040A20D SubControlYAxis:                        ; CODE XREF: sub_40A1A0+68↑j
+.text:0040A20D                 add     [esi+3Ch], edx
+.text:0040A210                 jmp     short loc_40A22B
+.text:0040A212 ; ---------------------------------------------------------------------------
+.text:0040A212
+.text:0040A212 loc_40A212:                             ; CODE XREF: sub_40A1A0+63↑j
+.text:0040A212                 cmp     ecx, 500
+.text:0040A218                 jle     short ClrControlYAxis
+.text:0040A21A                 cmp     [esi+3Ch], edi
+.text:0040A21D                 jge     short AddControlYAxis
+.text:0040A21F                 mov     [esi+3Ch], edi
+.text:0040A222
+.text:0040A222 AddControlYAxis:                        ; CODE XREF: sub_40A1A0+7D↑j
+.text:0040A222                 add     dword ptr [esi+3Ch], 1
+.text:0040A226                 jmp     short loc_40A22B
+.text:0040A228 ; ---------------------------------------------------------------------------
+.text:0040A228
+.text:0040A228 ClrControlYAxis:                        ; CODE XREF: sub_40A1A0+78↑j
+.text:0040A228                 mov     [esi+3Ch], edi
