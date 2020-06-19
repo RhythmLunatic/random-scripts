@@ -6,7 +6,7 @@ A: Doesn't work with Steam input remapping.
 The location where DInput writes its data is not static. But the location of where it gets written is kept in eax at instruction A1C7 (mov ecx,[eax]).
 
 structure is 4 bytes for control stick X axis, 4 bytes for control stick Y axis, 4 bytes of nothing, 8 bytes for control stick x and y axis, 8 more bytes of nothing, then 4 bytes for the DPad.
-^ That's an offset of 1C.
+^ That's an offset of 1C, or 28 in dec
 
 control stick X and Y axis: 4 bytes signed, min -1000, max 1000
 
@@ -109,57 +109,60 @@ upleft = 31500 (0C 7B 00 00)
 no direction = -1 (FFFFFF)
 
 new function should be:
-	mov		ecx, [eax+1C]			;Don't know how much to shift yet
-	or		edx, -1
+8b 48 1c	mov		ecx, [eax+1C]			;1C = dpad offset
+83 CA FF	or		edx, -1
 
-	cmp		ecx,edi 				;optimization, edi is 0, takes less bytes than checking 0.
-	js		short end				;if ecx was -1 (FF) jump to end
-	jne		short checkUpleft		;if ecx != 0 (up) jump to checkUpleft
+39 fa		cmp		ecx,edi 				;optimization, edi is 0, takes less bytes than checking 0.
+			js		short end				;if ecx was -1 (FF) jump to end
+			jne		short checkUpleft		;if ecx != 0 (up) jump to checkUpleft
 up:
-	add     [esi+3C], edx			;subtract from y axis
-	jmp		end
+89 7E 3C	add     [esi+3C], edx			;subtract from y axis
+89 7E 38	mov     [esi+38h], edi			;clear y axis
+			jmp		end
 checkUpleft:
-	cmp		cl, 0C					;upleft
-	jle		short checkLeft
+80 f9 0C	cmp		cl, 0x0C					;upleft
+			jle		short checkLeft
 upLeft:
-	add		[esi+3C], edx			;subtract from x axis
-	add     [esi+3C], edx			;subtract from y axis
-	jmp		short end
+01 56 38	add		[esi+38], edx			;subtract from x axis
+01 56 3C	add     [esi+3C], edx			;subtract from y axis
+			jmp		short end
 checkLeft:
-	cmp 	cl, 78						;left
-	jle 	short checkDownLeft
+80 F9 78	cmp 	cl, 0x78						;left
+			jle 	short checkDownLeft
 left:
-	add		[esi+3C], edx			;subtract from x axis
-	jmp		short end
+01 56 38	add		[esi+3C], edx			;subtract from x axis
+89 7E 38	mov     [esi+38], edi			;clear y axis
+			jmp		short end
 checkDownLeft:
-	cmp 	cl, E4					;downleft
-	jle 	short checkDownright
+80 F9 E4	cmp 	cl, 0xE4					;downleft
+			jle 	short checkDownright
 downleft:
-	add		[esi+3C], edx			;subtract from x axis
-	add		dword ptr [esi+3C], 1	;add to y axis
-	jmp		short end
+01 56 38	add		[esi+38], edx			;subtract from x axis
+83 46 3C 01	add		dword ptr [esi+3C], 1	;add to y axis
+			jmp		short end
 checkDownright:
-	cmp 	cl, BC
-	jle		short checkDown
+80 F9 BC	cmp 	cl, 0xBC
+			jle		short checkDown
 downright:
-	add     dword ptr [esi+38], 1	;add to x axis
-	add		dword ptr [esi+3C], 1	;add to y axis
-	jmp		short end
+83 46 38 01	add     dword ptr [esi+38], 1	;add to x axis
+83 46 3C 01	add		dword ptr [esi+3C], 1	;add to y axis
+			jmp		short end
 checkDown:
-	cmp		cl, 50
-	jle		short checkRight
+80 F9 50	cmp		cl, 0x50
+			jle		short checkRight
 down:
-	add		dword ptr [esi+3C], 1	;add to y axis
-	jmp		short end
+83 46 3C 01	add		dword ptr [esi+3C], 1	;add to y axis
+89 7E 38	mov     [esi+38], edi			;clear x axis
+			jmp		short end
 checkRight:
-	cmp		cl, 28
-	jle		short Upright			;No need to check upright because it's the last possible value.
+80 F9 28	cmp		cl, 0x28
+			jle		short Upright			;No need to check upright because it's the last possible value.
 right:
-	add		dword ptr [esi+3C], 1	;add to y axis
-	jmp		short end
+83 46 38 01	add		dword ptr [esi+38], 1	;add to x axis
+					jmp		short end
 Upright:
-	add		[esi+3Ch], edx			;subtract from x axis
-	add		dword ptr [esi+3C], 1	;add to y axis
+83 46 38 01	add     dword ptr [esi+38], 1	;add to x axis
+01 56 3C	add		[esi+3C], edx			;subtract from y axis
 	
 	
 	
