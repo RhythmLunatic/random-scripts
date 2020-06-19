@@ -6,6 +6,7 @@ A: Doesn't work with Steam input remapping.
 The location where DInput writes its data is not static. But the location of where it gets written is kept in eax at instruction A1C7 (mov ecx,[eax]).
 
 structure is 4 bytes for control stick X axis, 4 bytes for control stick Y axis, 4 bytes of nothing, 8 bytes for control stick x and y axis, 8 more bytes of nothing, then 4 bytes for the DPad.
+^ That's an offset of 1C.
 
 control stick X and Y axis: 4 bytes signed, min -1000, max 1000
 
@@ -31,6 +32,8 @@ Y Axis data is also stored but th123 doesn't use it.
 
 Current function:
 
+.text:0040A1C7                 mov     ecx, [eax]      ; move x-axis data into ecx
+.text:0040A1C9                 or      edx, -1
 .text:0040A1CC                 cmp     ecx, 0FFFFFE0Ch ; -500
 .text:0040A1D2                 jge     short loc_40A1E1 ; jump if greater or equal to -500
 .text:0040A1D4                 cmp     [esi+38h], edi  ; =/= 0
@@ -61,8 +64,8 @@ Current function:
 .text:0040A1FA
 .text:0040A1FA loc_40A1FA:                             ; CODE XREF: sub_40A1A0+3F↑j
 .text:0040A1FA                                         ; sub_40A1A0+55↑j
-.text:0040A1FA                 mov     ecx, [eax+4]
-.text:0040A1FD                 cmp     ecx, 0FFFFFE0Ch
+.text:0040A1FA                 mov     ecx, [eax+4]    ; move y-axis data into ecx
+.text:0040A1FD                 cmp     ecx, 0FFFFFE0Ch ; -500
 .text:0040A203                 jge     short loc_40A212
 .text:0040A205                 cmp     [esi+3Ch], edi
 .text:0040A208                 jle     short SubControlYAxis
@@ -106,7 +109,7 @@ upleft = 31500 (0C 7B 00 00)
 no direction = -1 (FFFFFF)
 
 new function should be:
-	mov		ecx, [eax+???]			;Don't know how much to shift yet
+	mov		ecx, [eax+1C]			;Don't know how much to shift yet
 	or		edx, -1
 
 	cmp		ecx,edi 				;optimization, edi is 0, takes less bytes than checking 0.
@@ -157,3 +160,6 @@ right:
 Upright:
 	add		[esi+3Ch], edx			;subtract from x axis
 	add		dword ptr [esi+3C], 1	;add to y axis
+	
+	
+	
