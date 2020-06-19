@@ -87,3 +87,73 @@ Current function:
 .text:0040A228
 .text:0040A228 ClrControlYAxis:                        ; CODE XREF: sub_40A1A0+78↑j
 .text:0040A228                 mov     [esi+3Ch], edi
+
+^ 5F, or 95 opcodes large according to IDA
+
+add		[esi+3Ch], edx				<- 01 56 38, only 3 bytes!
+add     dword ptr [esi+38h], 1		<- 83 46 38 01, 4 bytes
+
+Maybe something can be done?
+
+up = 0 (000000)
+upright = 4500 (94 11 00 00)
+right = 9000 (28 23 00 00)
+down = 18000 (50 46 00 00)
+downright = 13500 (BC 34 00 00)
+downleft = 22500 (E4 57 00 00)
+left = 27000 (78 69 00 00)
+upleft = 31500 (0C 7B 00 00)
+no direction = -1 (FFFFFF)
+
+new function should be:
+	mov		ecx, [eax+???]			;Don't know how much to shift yet
+	or		edx, -1
+
+	cmp		ecx,edi 				;optimization, edi is 0, takes less bytes than checking 0.
+	js		short end				;if ecx was -1 (FF) jump to end
+	jne		short checkUpleft		;if ecx != 0 (up) jump to checkUpleft
+up:
+	add     [esi+3C], edx			;subtract from y axis
+	jmp		end
+checkUpleft:
+	cmp		cl, 0C					;upleft
+	jle		short checkLeft
+upLeft:
+	add		[esi+3C], edx			;subtract from x axis
+	add     [esi+3C], edx			;subtract from y axis
+	jmp		short end
+checkLeft:
+	cmp 	cl, 78						;left
+	jle 	short checkDownLeft
+left:
+	add		[esi+3C], edx			;subtract from x axis
+	jmp		short end
+checkDownLeft:
+	cmp 	cl, E4					;downleft
+	jle 	short checkDownright
+downleft:
+	add		[esi+3C], edx			;subtract from x axis
+	add		dword ptr [esi+3C], 1	;add to y axis
+	jmp		short end
+checkDownright:
+	cmp 	cl, BC
+	jle		short checkDown
+downright:
+	add     dword ptr [esi+38], 1	;add to x axis
+	add		dword ptr [esi+3C], 1	;add to y axis
+	jmp		short end
+checkDown:
+	cmp		cl, 50
+	jle		short checkRight
+down:
+	add		dword ptr [esi+3C], 1	;add to y axis
+	jmp		short end
+checkRight:
+	cmp		cl, 28
+	jle		short Upright			;No need to check upright because it's the last possible value.
+right:
+	add		dword ptr [esi+3C], 1	;add to y axis
+	jmp		short end
+Upright:
+	add		[esi+3Ch], edx			;subtract from x axis
+	add		dword ptr [esi+3C], 1	;add to y axis
