@@ -3,10 +3,28 @@ If you thought Touhou 6 remapping was hard, prepare yourself! th123 only uses di
 Q: Why not use dinput8.dll replacement?
 A: Doesn't work with Steam input remapping.
 
+The location where DInput writes its data is not static. But the location of where it gets written is kept in eax at instruction A1C7 (mov ecx,[eax]).
 
-DInput8 writes controller data to 009F1D20. According to CE the writing is done at dinput8.DirectInput8Create+78B7 but since it's a separate thread the location probably isn't static...
+structure is 4 bytes for control stick X axis, 4 bytes for control stick Y axis, 4 bytes of nothing, 8 bytes for control stick x and y axis, 8 more bytes of nothing, then 4 bytes for the DPad.
+
+control stick X and Y axis: 4 bytes signed, min -1000, max 1000
+
+DPad:
+no direction = -1 (FFFFFF)
+up = 0 (000000)
+right = 9000 (28 23 00 00)
+down = 18000 (50 46 00 00)
+left = 27000 (78 69 00 00)
+
+upleft = 31500 (0C 7B 00 00)
+upright = 4500 (94 11 00 00)
+downright = 13500 (BC 34 00 00)
+downleft = 22500 (E4 57 00 00)
+
+As you can see, only 2 bytes are used and actually only 1 byte is needed.
+
 Controller checking is done at A1C7.
-After calling controller check function, eax is compared to 0, if not 0 then compare if ecx is less than -500, 
+After calling function to retrieve from location of eax, ecx is compared to 0, if not 0 then compare if ecx is less than -500, 
 if less than 500 subtract from location of where the controller X Axis info is stored for the game, if greater than -500 then
 add to it.
 Y Axis data is also stored but th123 doesn't use it.
