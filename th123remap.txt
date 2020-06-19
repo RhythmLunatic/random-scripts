@@ -1,9 +1,11 @@
-If you thought Touhou 6 remapping was hard, prepare yourself! th123 only uses dinput8 to check controller or keyboard!
+If you thought Touhou 6 remapping was hard, prepare yourself! th123 only uses dinput8 to check controller or keyboard! And it uses CoCreateInstance!
 
 Q: Why not use dinput8.dll replacement?
 A: Doesn't work with Steam input remapping.
 
-Controller check function is at DC60. NOPing it will crash the game.
+
+DInput8 writes controller data to 009F1D20. According to CE the writing is done at dinput8.DirectInput8Create+78B7 but since it's a separate thread the location probably isn't static...
+Controller checking is done at A1C7.
 After calling controller check function, eax is compared to 0, if not 0 then compare if ecx is less than -500, 
 if less than 500 subtract from location of where the controller X Axis info is stored for the game, if greater than -500 then
 add to it.
