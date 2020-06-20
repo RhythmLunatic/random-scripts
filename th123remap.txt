@@ -6,7 +6,7 @@ A: Doesn't work with Steam input remapping.
 The location where DInput writes its data is not static. But the location of where it gets written is kept in eax at instruction A1C7 (mov ecx,[eax]).
 
 structure is 4 bytes for control stick X axis, 4 bytes for control stick Y axis, 4 bytes of nothing, 8 bytes for control stick x and y axis, 8 more bytes of nothing, then 4 bytes for the DPad.
-^ That's an offset of 1C, or 28 in dec
+^ That's an offset of 20, or 32 in dec
 
 control stick X and Y axis: 4 bytes signed, min -1000, max 1000
 
@@ -112,7 +112,7 @@ Skip jumping to end after modifying x and y axis because more bytes are needed.
 Also jump a lot because we need to save on bytes..
 
 new function should be:
-8b 48 1c	mov		ecx, [eax+1C]			;1C = dpad offset
+8b 48 20	mov		ecx, [eax+20]			;20 = dpad offset (32 in dec)
 83 CA FF	or		edx, -1
 
 39 f9		cmp		ecx,edi 				;optimization, edi is 0, takes less bytes than checking 0.
@@ -123,14 +123,14 @@ EB 08		jmp		short upLeft+3			;jump to subtract from y axis instruction, only 2 b
 
 checkUpleft:
 80 f9 0C	cmp		cl, 0x0C					;upleft
-75 08	jne		short checkLeft
+75 06		jne		short checkLeft
 upLeft:
 01 56 38	add		[esi+38], edx			;subtract from x axis
 01 56 3C	add     [esi+3C], edx			;subtract from y axis
 
 checkLeft:
 80 F9 78	cmp 	cl, 0x78				;left
-75 08		jne 	short checkDownLeft
+75 06		jne 	short checkDownLeft
 left:
 01 56 3C	add		[esi+3C], edx			;subtract from x axis
 89 7E 38	mov     [esi+38], edi			;clear y axis
@@ -158,11 +158,11 @@ down:
 
 checkRight:
 80 F9 28	cmp		cl, 0x28
-75 07		jne		short checkUpright
+75 05		jne		short checkUpright
 
 right:
 89 7E 38	mov     [esi+38], edi			;clear y axis
-EB 06		jmp		0x06					;jump to 'add to x axis'
+EB 08		jmp		0x06					;jump to 'add to x axis'
 
 checkUpright:
 80 f9 94	cmp		cl, 0x94
@@ -172,6 +172,4 @@ Upright:
 01 56 3C	add		[esi+3C], edx			;subtract from y axis
 83 46 38 01	add     dword ptr [esi+38], 1	;add to x axis
 
-^^ broken
-
-8B 48 1C 83 CA FF 39 FA 7D 08 89 7E 38 75 38 EB 08 80 F9 0C 75 08 01 56 38 01 56 3C 80 F9 78 75 08 01 56 3C 89 7E 38 80 F9 E4 75 05 01 56 38 EB 09 80 F9 BC 75 08 83 46 38 01 83 46 3C 01 80 F9 50 75 07 83 46 3C 01 89 7E 38 80 F9 28 75 07 89 7E 38 EB 06 80 F9 94 75 07 01 56 3C 83 46 38 01
+Somehow these instructions are affecting the eax register so it's crashing...
