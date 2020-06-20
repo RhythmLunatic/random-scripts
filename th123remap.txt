@@ -109,17 +109,17 @@ upleft = 31500 (0C 7B 00 00)
 no direction = -1 (FFFFFF)
 
 Skip jumping to end after modifying x and y axis because more bytes are needed.
+Also jump a lot because we need to save on bytes..
 
 new function should be:
 8b 48 1c	mov		ecx, [eax+1C]			;1C = dpad offset
 83 CA FF	or		edx, -1
 
-39 fa		cmp		ecx,edi 				;optimization, edi is 0, takes less bytes than checking 0.
-78 XX	js		short end				;if ecx was -1 (FF) jump to end
-75 08		jne		short checkUpleft		;if ecx != 0 (up) jump to checkUpleft
-up:
-89 7E 3C	add     [esi+3C], edx			;subtract from y axis
-89 7E 38	mov     [esi+38h], edi			;clear y axis
+39 f9		cmp		ecx,edi 				;optimization, edi is 0, takes less bytes than checking 0.
+7D 08		jge		short checkUpleft		;if not 0 or -1, skip to checkUpleft
+89 7E 38	mov     [esi+38h], edi			;clear y axis for 0 or -1
+75 38		jnz		short down+7			;if -1 jump to the clear x-axis instruction
+EB 08		jmp		short upLeft+3			;jump to subtract from y axis instruction, only 2 bytes.
 
 checkUpleft:
 80 f9 0C	cmp		cl, 0x0C					;upleft
@@ -129,41 +129,49 @@ upLeft:
 01 56 3C	add     [esi+3C], edx			;subtract from y axis
 
 checkLeft:
-80 F9 78	cmp 	cl, 0x78						;left
-75 08	jne 	short checkDownLeft
+80 F9 78	cmp 	cl, 0x78				;left
+75 08		jne 	short checkDownLeft
 left:
-01 56 38	add		[esi+3C], edx			;subtract from x axis
+01 56 3C	add		[esi+3C], edx			;subtract from x axis
 89 7E 38	mov     [esi+38], edi			;clear y axis
 
 checkDownLeft:
-80 F9 E4	cmp 	cl, 0xE4					;downleft
-75 07	jne 	short checkDownright
+80 F9 E4	cmp 	cl, 0xE4				;downleft
+75 05		jne 	short checkDownright
 downleft:
 01 56 38	add		[esi+38], edx			;subtract from x axis
-83 46 3C 01	add		dword ptr [esi+3C], 1	;add to y axis
+EB 09		jmp		short downright+4		;jump to 'add to y axis'
 
 checkDownright:
 80 F9 BC	cmp 	cl, 0xBC
-75 0A	jne		short checkDown
+75 08		jne		short checkDown
 downright:
 83 46 38 01	add     dword ptr [esi+38], 1	;add to x axis
 83 46 3C 01	add		dword ptr [esi+3C], 1	;add to y axis
 
 checkDown:
 80 F9 50	cmp		cl, 0x50
-75 08	jne		short checkRight
+75 07		jne		short checkRight
 down:
 83 46 3C 01	add		dword ptr [esi+3C], 1	;add to y axis
 89 7E 38	mov     [esi+38], edi			;clear x axis
 
 checkRight:
 80 F9 28	cmp		cl, 0x28
-75 08	jne		short Upright			;No need to check upright because it's the last possible value.
+75 07		jne		short checkUpright
+
 right:
-83 46 38 01	add		dword ptr [esi+38], 1	;add to x axis
+89 7E 38	mov     [esi+38], edi			;clear y axis
+EB 06		jmp		0x06					;jump to 'add to x axis'
+
+checkUpright:
+80 f9 94	cmp		cl, 0x94
+75 07		jne		short end				;'end' meaning past upright..
 
 Upright:
-83 46 38 01	add     dword ptr [esi+38], 1	;add to x axis
 01 56 3C	add		[esi+3C], edx			;subtract from y axis
-	
-This is 94 instructions total. Only one byte to spare.
+83 46 38 01	add     dword ptr [esi+38], 1	;add to x axis
+
+^^ broken
+
+8B 48 1C 83 CA FF 39 FA 7D 08 89 7E 38 75 38 EB 08 80 F9 0C 75 08 01 56 38 01 56 3C 80 F9 78 75 08 01 56 3C 89 7E 38 80 F9 E4 75 05 01 56 38 EB 09 80 F9 BC 75 08 83 46 38 01 83 46 3C 01 80 F9 50 75 07 83 46 3C 01 89 7E 38 80 F9 28 75 07 89 7E 38 EB 06 80 F9 94 75 07 01 56 3C 83 46 38 01
