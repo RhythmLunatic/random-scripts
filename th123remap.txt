@@ -98,6 +98,7 @@ add     dword ptr [esi+38h], 1		<- 83 46 38 01, 4 bytes
 
 Maybe something can be done?
 
+no direction = -1 (FFFFFF)
 up = 0 (000000)
 upright = 4500 (94 11 00 00)
 right = 9000 (28 23 00 00)
@@ -106,19 +107,21 @@ downright = 13500 (BC 34 00 00)
 downleft = 22500 (E4 57 00 00)
 left = 27000 (78 69 00 00)
 upleft = 31500 (0C 7B 00 00)
-no direction = -1 (FFFFFF)
 
 Skip jumping to end after modifying x and y axis because more bytes are needed.
 Also jump a lot because we need to save on bytes..
+
+X AXIS= 38
+Y AXIS= 3C
 
 new function should be:
 8b 48 20	mov		ecx, [eax+20]			;20 = dpad offset (32 in dec)
 83 CA FF	or		edx, -1
 
 39 f9		cmp		ecx,edi 				;optimization, edi is 0, takes less bytes than checking 0.
-7D 08		jge		short checkUpleft		;if not 0 or -1, skip to checkUpleft
-89 7E 38	mov     [esi+38h], edi			;clear y axis for 0 or -1
-75 38		jnz		short down+7			;if -1 jump to the clear x-axis instruction
+7F 07		jg		short checkUpleft		;if not 0 or -1, skip to checkUpleft
+89 7E 38	mov     [esi+38], edi			;clear x axis for 0 or -1
+75 15		jnz		short left+3			;if -1 jump to the clear y-axis instruction
 EB 08		jmp		short upLeft+3			;jump to subtract from y axis instruction, only 2 bytes.
 
 checkUpleft:
@@ -132,8 +135,8 @@ checkLeft:
 80 F9 78	cmp 	cl, 0x78				;left
 75 06		jne 	short checkDownLeft
 left:
-01 56 3C	add		[esi+3C], edx			;subtract from x axis
-89 7E 38	mov     [esi+38], edi			;clear y axis
+01 56 38	add		[esi+38], edx			;subtract from x axis
+89 7E 3C	mov     [esi+3C], edi			;clear y axis
 
 checkDownLeft:
 80 F9 E4	cmp 	cl, 0xE4				;downleft
@@ -161,15 +164,25 @@ checkRight:
 75 05		jne		short checkUpright
 
 right:
-89 7E 38	mov     [esi+38], edi			;clear y axis
+89 7E 3C	mov     [esi+3C], edi			;clear y axis
 EB 08		jmp		0x06					;jump to 'add to x axis'
 
 checkUpright:
 80 f9 94	cmp		cl, 0x94
-75 07		jne		short end				;'end' meaning past upright..
+75 07		jne		short end				;
 
 Upright:
 01 56 3C	add		[esi+3C], edx			;subtract from y axis
 83 46 38 01	add     dword ptr [esi+38], 1	;add to x axis
 
-Somehow these instructions are affecting the eax register so it's crashing...
+end:
+	mov     ecx, [eax+4]
+	nop						;Fill in the last byte.
+	
+To copy and paste it yourself:
+	0xA1C7: 8B 48 20 83 CA FF 39 F9 7F 07 89 7E 38 75 15 EB 08 80 F9 0C 75 06 01 56 38 01 56 3C 80 F9 78 75 06 01 56 38 89 7E 3C 80 F9 E4 75 05 01 56 38 EB 09 80 F9 BC 75 08 83 46 38 01 83 46 3C 01 80 F9 50 75 07 83 46 3C 01 89 7E 38 80 F9 28 75 05 89 7E 3C EB 08 80 F9 94 75 07 01 56 3C 83 46 38 01 8B 48 04 90
+  
+If you want to use it in MemoryPatch module:
+[NativeDPadFix]
+Enabled=0
+0040A1C7=the above hex stuff
