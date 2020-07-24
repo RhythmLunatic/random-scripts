@@ -1,0 +1,5 @@
+Touhou 8: Imperishable Night keyboard remapping (with a hex editor)
+
+So for some reason the keyboard check in TH08 does nothing at all. Which means the game probably uses DirectInput instead.
+
+TODO...
