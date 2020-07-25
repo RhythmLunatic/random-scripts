@@ -1,5 +1,46 @@
 Touhou 8: Imperishable Night keyboard remapping (with a hex editor)
 
-So for some reason the keyboard check in TH08 does nothing at all. Which means the game probably uses DirectInput instead.
+There are two keyboard checks in th08, one of them is dead, the real one is at 43DD9E. The dead one uses GetKeyboardState so I'm guessing ZUN kept the old one in but put "if (false)" or something so it would only use the DirectInput one.
 
-TODO...
+Since the old key check is never used, if you want to remove it entirely jump to 43D989 and replace 0F 85 89 03 00 00 with E9 8A 03 00 00 90.
+
+DirectInput key code table: http://www.flint.jp/misc/?q=dik&lang=en
+
+There's no need to do any math since the keycodes are just negatively flipped in asm. Example:
+The Z key check is "0F B6 95 2C FF FF FF" in hex which translates to the opcode "movzx edx, [epb+D4]". Since the key code table above already lists Z as 2C, to change it to another key you just need to change the 2C to the key you want.
+
+
+Main keys:
+43DD9E: UP KEY     [epb+38] | up
+43DDBF: DOWN KEY   [epb+30] | down
+43DBE0: LEFT KEY   [epb+35] | left
+43DE00: RIGHT KEY  [epb+33] | right
+43DFDC: X KEY      [ebp+D3] | bomb/menu back
+43DFB9: Z KEY      [ebp+D4] | shot/menu accept
+43E000: LSHIFT KEY [epb+D6] | slow 1
+43E023: RSHIFT KEY [epb+CA] | slow 2
+43E047: ESC KEY    [epb+FF] | pause, menu back
+43E06B: LCTRL KEY  [epb+E3] | skip dialogue 1
+43E090: RCTRL KEY  [epb+63] | skip dialogue 2
+43E100: ENTER KEY  [epb+E4] | menu accept
+43DF49: HOME KEY   [epb+39] | screenshot 1
+43DF6D: P KEY      [epb+E7] | screenshot 2
+
+Alternate:
+43DE24: NUMPAD 8   [epb+b8] | up 2
+43DE48: NUMPAD 2   [epb+b0] | down 2
+Figure it out yourself I don't feel like doing any more math
+43DE6B: ???        [ebp+B5]
+43DE8F - movzx ecx,byte ptr [ebp-000000B3]
+th08.exe+3DEB6 - movzx eax,byte ptr [ebp-000000B9]
+th08.exe+3DED9 - movzx edx,byte ptr [ebp-000000B7]
+th08.exe+3DF00 - movzx ecx,byte ptr [ebp-000000B1]
+43DF24: numpad 3   [ebp+AF] | downright
+
+Hotkeys:
+43E0B4: Q KEY      [epb+F0] | quit to title when paused
+43E127: R KEY      [epb+ED] | restart on stage 1 when paused
+
+Debugger keys? They don't do anything:
+43E0DB: F KEY [epb+E1]
+43DF94: D KEY [epb+E0]
