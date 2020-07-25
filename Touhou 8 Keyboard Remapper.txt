@@ -2,7 +2,7 @@ Touhou 8: Imperishable Night keyboard remapping (with a hex editor)
 
 There are two keyboard checks in th08, one of them is dead, the real one is at 43DD9E. The dead one uses GetKeyboardState so I'm guessing ZUN kept the old one in but put "if (false)" or something so it would only use the DirectInput one.
 
-Since the old key check is never used, if you want to remove it entirely jump to 43D989 and replace 0F 85 89 03 00 00 with E9 8A 03 00 00 90.
+Since the old key check is never used, if you want to remove it entirely jump to 3D789 and replace 0F 85 89 03 00 00 with E9 8A 03 00 00 90.
 
 DirectInput key code table: http://www.flint.jp/misc/?q=dik&lang=en
 
