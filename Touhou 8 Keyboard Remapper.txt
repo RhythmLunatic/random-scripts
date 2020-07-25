@@ -11,20 +11,20 @@ The Z key check is "0F B6 95 2C FF FF FF" in hex which translates to the opcode 
 
 
 Main keys:
-43DD9E: UP KEY     [epb+38] | up
-43DDBF: DOWN KEY   [epb+30] | down
-43DBE0: LEFT KEY   [epb+35] | left
-43DE00: RIGHT KEY  [epb+33] | right
-43DFDC: X KEY      [ebp+D3] | bomb/menu back
-43DFB9: Z KEY      [ebp+D4] | shot/menu accept
-43E000: LSHIFT KEY [epb+D6] | slow 1
-43E023: RSHIFT KEY [epb+CA] | slow 2
-43E047: ESC KEY    [epb+FF] | pause, menu back
-43E06B: LCTRL KEY  [epb+E3] | skip dialogue 1
-43E090: RCTRL KEY  [epb+63] | skip dialogue 2
-43E100: ENTER KEY  [epb+E4] | menu accept
-43DF49: HOME KEY   [epb+39] | screenshot 1
-43DF6D: P KEY      [epb+E7] | screenshot 2
+3DB9E: UP KEY     [epb+38] | up
+3DBBF: DOWN KEY   [epb+30] | down
+3DBE0: LEFT KEY   [epb+35] | left
+3DC00: RIGHT KEY  [epb+33] | right
+3DDDC: X KEY      [ebp+D3] | bomb/menu back
+3DDB9: Z KEY      [ebp+D4] | shot/menu accept
+3De00: LSHIFT KEY [epb+D6] | slow 1
+3de23: RSHIFT KEY [epb+CA] | slow 2
+3de47: ESC KEY    [epb+FF] | pause, menu back
+3de6B: LCTRL KEY  [epb+E3] | skip dialogue 1
+3de90: RCTRL KEY  [epb+63] | skip dialogue 2
+3df00: ENTER KEY  [epb+E4] | menu accept
+3dd49: HOME KEY   [epb+39] | screenshot 1
+3dd6d: P KEY      [epb+E7] | screenshot 2
 
 Alternate:
 43DE24: NUMPAD 8   [epb+b8] | up 2
