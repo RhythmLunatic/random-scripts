@@ -7,20 +7,32 @@ To remap keys, change what address offset is used!
 
 https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 
+How to remap the keys:
+Take key you want from the table above, subtract 8 (in a hexidecimal calculator obviously) to get what to put in hex.
+So the instruction for ESC key check is "8B 85 13 FF FF FF", to replace with END key take END (0x28) and subtract 8 to get 0x20. Put down 8B 85 20 FF FF FF, as you can see only the third byte is changed.
+
+Not so simple way to find out what key it's checking (ignore this):
 Ex. Z key func is checking AE. Z is 5A in the virtual key codes list. Let's say we want to check '1' at the top of the keyboard instead. 5A-31=29. Then ADD the result to where the key would be checking, so AE+29=D7. Now we have the function `mov eax,[ebp-000000D7]`. To get that in hex, do 100-D7 for 29, so the full function is 8B 85 29. Jump to the location of the asm func in a hex editor (tip: Ctrl+G jumps) and overwrite the existing value with the one you obtained in hex.
 
-Simple way to find out what key it's checking:
 Subtract from E0 since we know E0 is down. For example, let's use [epb-AE]. E0 - AE is 32. Since down is key 0x28, add 32 to 0x28. This gets us key 0x5A, which is Z.
+
+Dumb algebra way to remap the key (ignore this):
+You might notice the epb offsets are reversed, because SHIFT (0x10) comes before CTRL (0x11) but you're subtracting one more for SHIFT.
+EPB maximum is 108. This was calculated by doing a known key index and a known epb offset (10+F8=108)
+108 - offset = keyboard button, so offset = -keyboard button+108
+108-F8=10 (SHIFT)
+And in reverse, -10+108=F8 (SHIFT in the complicated way the array is constructed)
+So if we want to replace ESC with END (0x23), do -23+108 to get E5.
 
 1D857: UP KEY     [epb-E2]
 1D885: DOWN KEY   [epb-E0]
 1D8B1: LEFT KEY   [epb-E3]
 1D8DE: RIGHT KEY  [epb-E1]
-1DAAF: Z KEY      [ebp-AE]
+1DAAF: Z KEY      [ebp-AE] | 8B 85 52 FF FF FF | Key 0x5A
 1DADA: X KEY      [epb-B0]
-1DB07: SHIFT KEY  [epb-F8]
-1DB35: ESC KEY    [epb-ED]
 1DB61: CTRL KEY   [epb-F7]
+1DB07: SHIFT KEY  [epb-F8]
+1DB35: ESC KEY    [epb-ED] | 8B 85 13 FF FF FF | Key 0x1B
 
 Secondary controls: 
 1D90F: Numpad 2 (down)      [epb-A0]
