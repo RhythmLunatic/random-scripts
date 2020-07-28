@@ -24,6 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 SUBREDDITS_TO_CHECK = ["dankmemes","memes"]
 WEBHOOK_URL = ""
+PATH = "/root/zivChecker/"
 #https://old.reddit.com/r/dankmemes/new/.json?count=24
 
 for sub in SUBREDDITS_TO_CHECK:
@@ -36,7 +37,7 @@ for sub in SUBREDDITS_TO_CHECK:
 	#Number of new posts since last check
 	newPosts = 24
 	try:
-		with open(sub+".json","r") as f:
+		with open(PATH+sub+".json","r") as f:
 			oldJson = json.loads(f.read())
 			#if it reaches the end of the for loop then all posts are new
 			#"What if there more than 24 posts an hour"? Idk maybe don't do that
@@ -45,9 +46,9 @@ for sub in SUBREDDITS_TO_CHECK:
 					newPosts = i
 					break
 	except:
-		print("File not found, creating a new one.")
-		with open(sub+".json","w") as f:
-			f.write(r.text)
+		print("File not found. If this is the first time checking the subreddit, ignore this message.")
+	with open(PATH+sub+".json","w") as f:
+		f.write(r.text)
 	print("Number of new posts: "+str(newPosts))
 	for i in range(newPosts):
 		post = latestJson['data']['children'][i]['data']
