@@ -7,6 +7,7 @@ import os.path
 #import xml.etree.ElementTree as ET
 import urllib.parse
 #from xml.dom import minidom
+import html
 
 """
 A cron script to check gelbooru and check new posts.
@@ -37,8 +38,8 @@ TAGS_TO_CHECK = ["fischl_(genshin_impact) rating:safe", "girls_frontline rating:
 #Increase or reduce this depending on how often the cronjob runs... Default is 24
 NUM_POSTS_TO_CHECK = 5
 WEBHOOK_URL = ""
-PATH = "./"
-#PATH = "/root/zivChecker/"
+#PATH = "./"
+PATH = "/root/zivChecker/"
 
 #For safe file names
 def slugify(value):
@@ -56,7 +57,7 @@ def getNumNewPosts(oldJson, latestJson):
 				print("Matched post after "+str(i)+" iteration")
 				return i,j
 			else:
-				print(latestPost + " != "+oldLatestPost)
+				print(latestPost['file_url'] + " != "+oldLatestPost['file_url'])
 		print("Couldn't find the last saved post, trying the next last saved post...")
 	print("Failed to find any posts. Giving up and posting them all.")
 	return NUM_POSTS_TO_CHECK,0
@@ -66,6 +67,7 @@ for tag in TAGS_TO_CHECK:
 	print("checking "+tag)
 	#r = requests.get("https://old.reddit.com/r/"+sub+"/new/.json?count="+str(NUM_POSTS_TO_CHECK), headers = {'User-agent': 'Mozilla/5.0 (Windows NT 5.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36'})
 	r = requests.get("https://gelbooru.com/index.php?page=dapi&json=1&s=post&q=index&limit="+str(NUM_POSTS_TO_CHECK)+"&tags="+tag.replace(' ','+'))
+	print("Got JSON from server.")
 	latestJson = json.loads(r.text)
 	#print(latestJson)
 	
@@ -91,7 +93,7 @@ for tag in TAGS_TO_CHECK:
 	for i in range(newPosts):
 		post = latestJson[i]
 		
-		description="\n[Source]("+post['source']+")"
+		description="\n[Source]("+html.unescape(post['source'])+")"
 		#description = post['tags']
 		if i==0 and numRemovedPosts>1:
 			description+="\nNote: The last post before this one was removed from this subreddit!"

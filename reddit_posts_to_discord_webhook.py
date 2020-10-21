@@ -4,6 +4,7 @@ import json
 import datetime
 import sys
 import os.path
+import html
 
 """
 A cron script to check subreddits and check new posts.
@@ -37,8 +38,6 @@ WEBHOOK_URL = ""
 PATH = "/root/zivChecker/"
 #https://old.reddit.com/r/dankmemes/new/.json?count=24
 
-
-#Returns number of new posts, number of removed posts.
 def getNumNewPosts(oldJson, latestJson):
 	for j in range(NUM_POSTS_TO_CHECK):
 		oldLatestPost = oldJson['data']['children'][j]['data']['permalink']
@@ -53,7 +52,7 @@ def getNumNewPosts(oldJson, latestJson):
 				print(latestPost + " != "+oldLatestPost)
 		print("Couldn't find the last saved post, trying the next last saved post...")
 	print("Failed to find any posts. Giving up and posting them all.")
-	return NUM_POSTS_TO_CHECK,0
+	return NUM_POSTS_TO_CHECK
 
 print(datetime.datetime.now())
 for sub in SUBREDDITS_TO_CHECK:
@@ -87,7 +86,7 @@ for sub in SUBREDDITS_TO_CHECK:
 		dataToSend = {
 			"username":"/r/"+sub,
 			"embeds": [{
-				"title":post['title'],
+				"title":html.unescape(post['title']),
 				"description":description,
 				"url":post['url']
 			}]
