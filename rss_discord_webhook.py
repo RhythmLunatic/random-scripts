@@ -15,7 +15,7 @@ from bs4 import BeautifulSoup
 A cron script to check RSS feeds and check new posts.
 Don't run it every minute, sometimes it takes longer than a minute to run the check so another process spawns, tries opening the file, then fails and overwrites it and then it reposts old links
 Btw, my cronjob:
-*/2  *  * * *   root    /root/.pyenv/shims/python3 /root/zivChecker/rss_discord_webhook.py > /tmp/out.txt
+*/30  *  * * *   root    /root/.pyenv/shims/python3 /root/zivChecker/rss_discord_webhook.py > /tmp/out.txt
 
 It's AGPLv3 becuase I said so, don't put this in your closed source discord bot.
 Special thanks to https://discohook.org for the embed previewer
@@ -36,18 +36,24 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-
 WEBSITES_TO_CHECK = []
 #Increase or reduce this depending on how often the cronjob runs... Default is 24
-NUM_POSTS_TO_CHECK = 10
+NUM_POSTS_TO_CHECK = 5
 WEBHOOK_URL = ""
 PATH = "./"
-#PATH = "/root/zivChecker/"
 
 #For safe file names
 def slugify(value):
 	return "".join([x if x.isalnum() else "_" for x in value])
 
+def getIamge(url):
+	print("Scraping "+url+" for meta tag")
+	r2 = requests.get(url)
+	soup2 = BeautifulSoup(r2.text,"lxml")
+	image = soup2.find("meta",property="og:image")
+	if image != None:
+		print("Found image in meta tag "+image['content'])
+		return image['content']
 
 #Remove HTML tags in text
 class HTMLFilter(HTMLParser):
@@ -67,7 +73,7 @@ def getNumNewPosts(oldXml, latestXml):
 				print("Matched post after "+str(i)+" iteration")
 				return i,j
 			else:
-				print(latestPost['file_url'] + " != "+oldLatestPost['file_url'])
+				print(latestPost.find('link').text + " != "+oldLatestPost.find('link').text)
 		print("Couldn't find the last saved post, trying the next last saved post...")
 	print("Failed to find any posts. Giving up and posting them all.")
 	return NUM_POSTS_TO_CHECK,0
@@ -93,8 +99,7 @@ for site in WEBSITES_TO_CHECK:
 	else:
 		print("File not found. If this is the first time checking the tag, ignore this message.")
 		newPosts = 2
-	with open(fileName,"w") as f:
-		f.write(r.text)
+		
 	print("Number of new posts: "+str(newPosts))
 	for i in range(newPosts):
 		post = latestXml[i]
@@ -102,9 +107,12 @@ for site in WEBSITES_TO_CHECK:
 		
 		content = post.find("{http://purl.org/rss/1.0/modules/content/}encoded")
 		soup = None
+		img = None
 		if content != None:
-			soup = BeautifulSoup(content.text)
-		
+			soup = BeautifulSoup(content.text,"lxml")
+			res = soup.find('img')
+			img = res['src'] if res else None
+			
 		description = "No description."
 		if post.find('description') != None:
 			print("desc found.")
@@ -124,21 +132,16 @@ for site in WEBSITES_TO_CHECK:
 			}]
 		}
 		
-		if soup != None:
-			img = soup.find('img')
-			if img:
-				dataToSend['embeds'][0]["image"]= {
-					"url":img['src']
-				}
-			"""if post['file_url'].endswith(('.jpg', '.jpeg', '.png', '.gif')):
-				dataToSend['embeds'][0]["image"]= {
-					"url":post['file_url']
-				}
-			else:
-				dataToSend['embeds'][0]["image"]= {
-					"url":post['preview_url']
-				}"""
-		r = requests.post(
+		if not img:
+			img = getIamge(dataToSend['embeds'][0]["url"])
+		if img:
+			dataToSend['embeds'][0]["image"]= {
+				"url":img
+			}
+		#print(dataToSend)
+		r2 = requests.post(
 			WEBHOOK_URL,
 			json = dataToSend
 		)
+	with open(fileName,"w") as f:
+		f.write(r.text)
