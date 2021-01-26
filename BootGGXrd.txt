@@ -1,0 +1,9 @@
+Opening BootGGXrd.exe in a decompiler, it's very easy to see what it does.
+
+Well, I don't actually know half these WinAPI calls, but it seems to create a language file if it doesn't exist. Then proceed to read the file.
+
+There are launch arguments for -PATH=, -APP=, and -REBOOT and some multiplayer flags. But for launching the game normally, this is all you need:
+
+GuiltyGearXrd.exe -SEEKFREELOADINGPCCONSOLE -NOHOMEDIR -NOSPLASH -LANGUAGE=0
+
+Steam will warn you that something is trying to launch a game with these flags, just hit yes. Now you can launch GGXrd without admin.
